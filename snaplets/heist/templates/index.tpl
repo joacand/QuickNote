@@ -13,30 +13,32 @@
   </head>
   <body>  
     <header>
-      <h1>Quick notes!</h1>
-      <p>Enter your notes, with the optional author and press submit.</p>
+      <h1>Quick Notes!</h1>
+      <p>Enter your notes and click 'Create PDF'</p>
     </header>
     <div id="container">
       <nav>
         <h2>Special syntax:</h2>
+        <p>Commands need to be entered at the beginning of a line but can be written several times in a row (no spaces)</p>
         <ul id="menu">
-          <li><i>#c#</i> - For indented and unparsed text, good for code</li>
-          <li><i>#n#</i> - Force newline</li>
+          <li><i>##c</i>  - Text ident</li>
+          <li><i>##br</i> - Line break</li>
+          <li><i>##np</i> - Page break</li>
         </ul>
       </nav>
       <section>
         <form name="foo" method="post">
           <h5>Author (optional):<br>
           <input type="text" name="author" size="100" autocomplete="on" autofocus> </h5>
-          <h5>Note:<br>
+          <h5>Notes:<br>
           <textarea name="note" cols="100" rows="20" autocomplete="off" placeholder="Enter your notes here!" required></textarea><br>
-          <input type="submit" value="Submit" /></h5>
+          <input type="submit" value="Create PDF" /></h5>
         </form>
       </section>
     </div>
     <footer>
       <!-- Eventuell copyright osv -->
-      <p>QuickNote v0.1 - Written in Haskell</p>
+      <p><a href="https://github.com/joacand/QuickNote">QuickNote v0.1</a> - Written in Haskell</p>
     </footer>
   </body>
 </html>

@@ -42,7 +42,8 @@ indexHandler = do
     Nothing -> render "index"
   where
     makePDF au no = do
-      liftIO $ renderFile "note.tex" $ createPDF (decodeUtf8 au) ((split (=='\n') . decodeUtf8) no)
+      liftIO $ renderFile "note.tex" $ createPDF (decodeUtf8 au) 
+                                       ((split (=='\n') . decodeUtf8) no)
       res <- liftIO $ runPdflatex
       res2 <- liftIO $ runCopy
       render "test"
@@ -72,7 +73,18 @@ thePreamble au =
 -- | Creates a body for the latex document
 theBody :: [Text] -> LaTeX
 theBody []     = toLatex ""
-theBody (n:ns) = toLatex n <> par <> theBody ns
+theBody (n:ns) = (addSyntax . unpack) n <> par <> theBody ns
+  where
+    addSyntax []         = toLatex ""
+    addSyntax q@(x:y:z:z':xs) = if (x=='#' && y=='#')
+                           then parseSyn [z,z'] xs
+                           else fromString q
+    addSyntax xs         = fromString xs
+    parseSyn c xs = case c of
+      ('c':r)     -> indent <> addSyntax (r++xs)
+      ('b':'r':r) -> bigskip <> addSyntax (r++xs)
+      ('n':'p':r) -> newpage <> addSyntax (r++xs)
+      otherwise   -> fromString $ "##"++c++xs
 
 -- | Function to convert from 'Text' to 'LaTeX'
 toLatex :: Text -> LaTeX
