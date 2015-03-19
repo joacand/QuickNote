@@ -12,7 +12,7 @@ import Snap.Http.Server
 import Text.LaTeX hiding (render)
 import Text.LaTeX.Base.Class (fromLaTeX)
 import Text.LaTeX.Packages.Inputenc
-import Data.Text hiding (map, concat, filter)
+import Data.Text as DT hiding (map, concat, filter, tail)
 import Data.Text.Encoding
 import System.Process
 
@@ -46,7 +46,7 @@ indexHandler = do
                                        ((split (=='\n') . decodeUtf8) no)
       res <- liftIO $ runPdflatex
       res2 <- liftIO $ runCopy
-      render "test"
+      render "pdfpage"
     runPdflatex = readProcess "pdflatex" ["note.tex"] ""
     runCopy     = readProcess "cp" ["note.pdf", "static/"] ""
 
@@ -75,16 +75,22 @@ theBody :: [Text] -> LaTeX
 theBody []     = toLatex ""
 theBody (n:ns) = (addSyntax . unpack) n <> par <> theBody ns
   where
-    addSyntax []         = toLatex ""
-    addSyntax q@(x:y:z:z':xs) = if (x=='#' && y=='#')
-                           then parseSyn [z,z'] xs
-                           else fromString q
-    addSyntax xs         = fromString xs
+    addSyntax []              = toLatex ""
+    addSyntax q@(x:y:z:z':xs) = if (x=='\\') 
+                                then escapeChar (tail q) 
+                                else if (x=='#' && y=='#')
+                                     then parseSyn [z,z'] xs
+                                     else fromString [x] <> 
+                                          addSyntax (tail q)
+    addSyntax (x:xs)          = if (x=='\\') then escapeChar xs 
+                                             else fromString (x:xs)
     parseSyn c xs = case c of
       ('c':r)     -> indent <> addSyntax (r++xs)
       ('b':'r':r) -> bigskip <> addSyntax (r++xs)
       ('n':'p':r) -> newpage <> addSyntax (r++xs)
-      otherwise   -> fromString $ "##"++c++xs
+      otherwise   -> fromString "#" <> addSyntax ("#"++c++xs)
+    escapeChar []     = fromString ""
+    escapeChar (x:xs) = fromString [x] <> addSyntax xs
 
 -- | Function to convert from 'Text' to 'LaTeX'
 toLatex :: Text -> LaTeX

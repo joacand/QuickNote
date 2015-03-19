@@ -19,7 +19,7 @@
     <div id="container">
       <nav>
         <h2>Special syntax:</h2>
-        <p>Commands need to be entered at the beginning of a line but can be written several times in a row (no spaces)</p>
+        <p>Escape characters with '\'</p>
         <ul id="menu">
           <li><i>##c</i>  - Text ident</li>
           <li><i>##br</i> - Line break</li>
