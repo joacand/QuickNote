@@ -23,10 +23,12 @@ header {
 }
 
 nav {
-    font-size:70%;
-    line-height:15px;
-    background-color:#eeeeee;
-    width:200px;
+    font-size:80%;
+    line-height:17px;
+    background-color:#eeeeee; 
+/*    background-color:#000044;  */
+/*    color:#FFFFFF;
+*/    width:200px;
     float:left;
     padding:5px; 
     padding-bottom:100%;
@@ -52,6 +54,24 @@ footer {
 textarea, input {
   font-size:120%;
   background-color:#F0F0F0; 
+}
+/* blue button */
+
+input.btn.btn-blue {
+	background-color: #699DB6;
+	border-color: rgba(0,0,0,0.3);
+	text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+	color: #FFF;
+}
+
+input.btn.btn-blue:hover {
+  background-color: #4F87A2;
+  border-color: rgba(0,0,0,0.5);
+}
+
+input.btn.btn-blue:active {
+  background-color: #3C677B;
+  border-color: rgba(0,0,0,0.9);
 }
 
 input {

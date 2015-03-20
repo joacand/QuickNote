@@ -21,6 +21,8 @@
         <h2>Special syntax:</h2>
         <p>Escape characters with '\'</p>
         <ul id="menu">
+          <li><i>##r</i> - <br>Enter raw LaTeX code. Make sure any braces, commands or environments are properly closed.</li>
+          <br>
           <li><i>##c</i>  - Text ident</li>
           <li><i>##br</i> - Line break</li>
           <li><i>##np</i> - Page break</li>
@@ -32,7 +34,7 @@
           <input type="text" name="author" size="100" autocomplete="on" autofocus> </h5>
           <h5>Notes:<br>
           <textarea name="note" cols="100" rows="20" autocomplete="off" placeholder="Enter your notes here!" required></textarea><br>
-          <input type="submit" value="Create PDF" /></h5>
+          <input type="submit" value="Create PDF" class="btn btn-blue" /></h5>
         </form>
       </section>
     </div>

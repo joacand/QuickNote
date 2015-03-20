@@ -86,6 +86,7 @@ theBody (n:ns) = (addSyntax . unpack) n <> par <> theBody ns
                                              else fromString (x:xs)
     parseSyn c xs = case c of
       ('c':r)     -> indent <> addSyntax (r++xs)
+      ('r':r)     -> (raw . pack) (r++xs)
       ('b':'r':r) -> bigskip <> addSyntax (r++xs)
       ('n':'p':r) -> newpage <> addSyntax (r++xs)
       otherwise   -> fromString "#" <> addSyntax ("#"++c++xs)
