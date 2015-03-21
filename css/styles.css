@@ -51,6 +51,10 @@ footer {
     padding:1px; 
 }
 
+input#backbtn {
+  font-size:100%;
+}
+
 textarea, input {
   font-size:120%;
   background-color:#F0F0F0; 
@@ -75,6 +79,10 @@ input.btn.btn-blue:active {
 }
 
 input {
+}
+
+object {
+  height:100vh;
 }
 
 body {
