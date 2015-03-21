@@ -15,6 +15,7 @@ import Text.LaTeX.Packages.Inputenc
 import Data.Text as DT hiding (map, concat, filter, tail)
 import Data.Text.Encoding
 import System.Process
+import System.Exit 
 
 data Notes = Notes { _heist :: Snaplet (Heist Notes)
                    }
@@ -44,11 +45,16 @@ indexHandler = do
     makePDF au no = do
       liftIO $ renderFile "note.tex" $ createPDF (decodeUtf8 au) 
                                        ((split (=='\n') . decodeUtf8) no)
-      res <- liftIO $ runPdflatex
-      res2 <- liftIO $ runCopy
-      render "pdfpage"
-    runPdflatex = readProcess "pdflatex" ["note.tex"] ""
-    runCopy     = readProcess "cp" ["note.pdf", "static/"] ""
+      (eCode, _, _) <- liftIO $ runPdflatex
+      case eCode of
+        (ExitFailure x) -> render "indexerr"
+        (ExitSuccess)   -> do
+          (eCode2, _, _) <- liftIO $ runCopy
+          case eCode2 of
+            (ExitFailure x) -> render "indexerr"
+            (ExitSuccess)   -> render "pdfpage"
+    runPdflatex = readProcessWithExitCode "pdflatex" ["note.tex"] ""
+    runCopy     = readProcessWithExitCode "cp" ["note.pdf", "static/"] ""
 
 -- | Initializer for notes snaplet
 notesInit :: SnapletInit Notes Notes
@@ -76,22 +82,26 @@ theBody []     = toLatex ""
 theBody (n:ns) = (addSyntax . unpack) n <> par <> theBody ns
   where
     addSyntax []              = toLatex ""
-    addSyntax q@(x:y:z:z':xs) = if (x=='\\') 
-                                then escapeChar (tail q) 
-                                else if (x=='#' && y=='#')
-                                     then parseSyn [z,z'] xs
-                                     else fromString [x] <> 
-                                          addSyntax (tail q)
-    addSyntax (x:xs)          = if (x=='\\') then escapeChar xs 
-                                             else fromString (x:xs)
+    addSyntax q@(x:y:z:z':xs) = case x of
+      '\\'      -> rawLatex q
+      '}'       -> escapeChar (tail q)
+      otherwise -> if (x=='#' && y=='#')
+                   then parseSyn [z,z'] xs
+                   else fromString [x] <> 
+                        addSyntax (tail q)
+    addSyntax (x:xs)          = case x of
+      '\\'      -> rawLatex $ x:xs
+      '}'       -> escapeChar xs 
+      otherwise -> fromString (x:xs)
     parseSyn c xs = case c of
       ('c':r)     -> indent <> addSyntax (r++xs)
-      ('r':r)     -> (raw . pack) (r++xs)
+      ('r':r)     -> rawLatex $ r++xs
       ('b':'r':r) -> bigskip <> addSyntax (r++xs)
       ('n':'p':r) -> newpage <> addSyntax (r++xs)
       otherwise   -> fromString "#" <> addSyntax ("#"++c++xs)
     escapeChar []     = fromString ""
     escapeChar (x:xs) = fromString [x] <> addSyntax xs
+    rawLatex = raw . pack
 
 -- | Function to convert from 'Text' to 'LaTeX'
 toLatex :: Text -> LaTeX

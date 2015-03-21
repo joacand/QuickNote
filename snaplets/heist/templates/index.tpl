@@ -1,32 +1,20 @@
-<!DOCTYPE html>
-<html lang="en-US">
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="css/styles.css" type="text/css">
-    <title>Quick notes!</title>
-    
-    <!-- Internet Explorer support ... -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>  
+<apply template="base">
     <header>
       <h1>Quick Notes!</h1>
       <p>Enter your notes and click 'Create PDF'</p>
     </header>
     <div id="container">
       <nav>
-        <h2>Special syntax:</h2>
-        <p>Escape characters with '\'</p>
+        <h2>Instructions</h2>
+        <p>Escape characters with '}'.</p>
+        <p>You can write raw LaTeX code with the regular \ LaTeX syntax. Make sure any braces, commands or environments are properly closed.</p>
+        <h3>Special syntax:</h3>
         <ul id="menu">
-          <li><i>##r</i> - <br>Enter raw LaTeX code. Make sure any braces, commands or environments are properly closed.</li>
-          <br>
           <li><i>##c</i>  - Text ident</li>
           <li><i>##br</i> - Line break</li>
           <li><i>##np</i> - Page break</li>
         </ul>
+        <apply-content/>
       </nav>
       <section>
         <form name="foo" method="post">
@@ -42,6 +30,5 @@
       <!-- Eventuell copyright osv -->
       <p><a href="https://github.com/joacand/QuickNote">QuickNote v0.1</a> - Written in Haskell</p>
     </footer>
-  </body>
-</html>
+</apply>
 
