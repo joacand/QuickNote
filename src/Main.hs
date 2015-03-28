@@ -5,6 +5,8 @@ module Main where
 import Control.Applicative
 import Snap
 import Snap.Snaplet.Heist
+import Heist
+import Heist.Interpreted
 import Control.Lens
 import Snap.Core
 import Snap.Util.FileServe
@@ -16,8 +18,10 @@ import Data.Text as DT hiding (map, concat, filter, tail)
 import Data.Text.Encoding
 import System.Process
 import System.Exit 
+import Data.IORef
 
 data Notes = Notes { _heist :: Snaplet (Heist Notes)
+                   , _notenr :: IORef Integer
                    }
 makeLenses ''Notes
 
@@ -37,24 +41,29 @@ indexHandler = do
   author <- getParam "author"
   case notes of
     Just no -> do
+      noteRef <- use notenr
+      noteNumber <- liftIO $ readIORef noteRef
+      liftIO $ modifyIORef' noteRef (+1)
+      notenr .= noteRef
       case author of
-        Just au -> makePDF au no
-        Nothing -> makePDF "" no
+        Just au -> makePDF au no ("note" ++ show noteNumber)
+        Nothing -> makePDF "" no ("note" ++ show noteNumber)
     Nothing -> render "index"
   where
-    makePDF au no = do
-      liftIO $ renderFile "note.tex" $ createPDF (decodeUtf8 au) 
-                                       ((split (=='\n') . decodeUtf8) no)
-      (eCode, _, _) <- liftIO $ runPdflatex
+    makePDF au no note = do
+      liftIO $ renderFile (note++".tex") $ createPDF (decodeUtf8 au) 
+                                           ((split (=='\n') . decodeUtf8) no)
+      (eCode, _, _) <- liftIO $ runPdflatex (note ++ ".tex")
       case eCode of
         (ExitFailure x) -> render "indexerr"
         (ExitSuccess)   -> do
-          (eCode2, _, _) <- liftIO $ runCopy
+          (eCode2, _, _) <- liftIO $ runCopy (note ++ ".pdf")
           case eCode2 of
             (ExitFailure x) -> render "indexerr"
-            (ExitSuccess)   -> render "pdfpage"
-    runPdflatex = readProcessWithExitCode "pdflatex" ["note.tex"] ""
-    runCopy     = readProcessWithExitCode "cp" ["note.pdf", "static/"] ""
+            (ExitSuccess)   -> renderWithSplices "pdfpage" 
+                               (noteSplice (note++".pdf"))
+    runPdflatex note = readProcessWithExitCode "pdflatex" [note] ""
+    runCopy     note = readProcessWithExitCode "cp" [note, "static/"] ""
 
 -- | Initializer for notes snaplet
 notesInit :: SnapletInit Notes Notes
@@ -63,7 +72,13 @@ notesInit = makeSnaplet "notes" "Note maker" Nothing $ do
   addRoutes [("static", serveDirectory "static")
             , ("css", serveDirectory "css")
             , ("", indexHandler) ]
-  return $ Notes { _heist = h }
+  newRef <- liftIO $ newIORef 0
+  return $ Notes { _heist = h, _notenr = newRef }
+
+-- | Splice used to pass the correct filename to the PDF template
+noteSplice :: (Monad m) => String -> Splices (HeistT n m Template)
+noteSplice n = do
+  "note" ## textSplice (DT.pack $ n)
 
 -- | Creates the LaTeX PDF
 createPDF :: Text -> [Text] -> LaTeX
