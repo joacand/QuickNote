@@ -19,6 +19,7 @@ import Data.Text.Encoding
 import System.Process
 import System.Exit 
 import Data.IORef
+import Data.Maybe
 
 data Notes = Notes { _heist :: Snaplet (Heist Notes)
                    , _notenr :: IORef Integer
@@ -37,20 +38,20 @@ main = do
 -- gets the notes and author and creates the PDF document
 indexHandler :: Handler Notes Notes ()
 indexHandler = do
-  notes  <- getParam "note"
+  title  <- getParam "title"
   author <- getParam "author"
+  notes  <- getParam "note"
   case notes of
     Just no -> do
       noteRef <- use notenr
       noteNumber <- liftIO $ readIORef noteRef
-      case author of
-        Just au -> makePDF au no ("note" ++ show noteNumber) noteRef
-        Nothing -> makePDF "" no ("note" ++ show noteNumber) noteRef
+      makePDF (fromMaybe "" title) (fromMaybe "" author) no 
+              ("note" ++ show noteNumber) noteRef
     Nothing -> renderWithSplices "index" (errorSplice "" "")
   where
-    makePDF au no note noteRef = do
-      liftIO $ renderFile ("tmp/"++note++".tex") $ createPDF (decodeUtf8 au) 
-                                           ((split (=='\n') . decodeUtf8) no)
+    makePDF ti au no note noteRef = do
+      liftIO $ renderFile ("tmp/"++note++".tex") $ createPDF (decodeUtf8 ti) 
+                          (decodeUtf8 au) ((split (=='\n') . decodeUtf8) no)
       (eCode, _, _) <- liftIO $ runPdflatex ("tmp/"++note ++ ".tex")
       case eCode of
         (ExitFailure x) -> renderError no
@@ -91,15 +92,15 @@ noteSplice n = do
   "note" ## textSplice (DT.pack n)
 
 -- | Creates the LaTeX PDF
-createPDF :: Text -> [Text] -> LaTeX
-createPDF a s = thePreamble a <> document (maketitle <> (theBody s))
+createPDF :: Text -> Text -> [Text] -> LaTeX
+createPDF t a s = thePreamble t a <> document (maketitle <> (theBody s))
 
 -- | The preamble for the latex document
-thePreamble :: Text -> LaTeX
-thePreamble au =
+thePreamble :: Text -> Text -> LaTeX
+thePreamble ti au =
   documentclass [] article <> 
   usepackage [utf8] inputenc <> -- Enable UTF8 encoding for scandinavic chars
-  title "Notes" <> author (toLatex au)
+  title (toLatex ti) <> author (toLatex au)
 
 -- | Creates a body for the latex document
 theBody :: [Text] -> LaTeX

@@ -22,6 +22,10 @@ header {
   padding:1px;
 }
 
+h5 {
+  margin:5px;
+}
+
 nav {
     font-size:80%;
     line-height:17px;
@@ -38,7 +42,9 @@ nav {
 section {
     width:350px;
     float:left;
-    padding:10px; 
+    padding-left:10px;
+    padding-right:10px;
+    padding-top:10px; 
     padding-bottom:100%;
     margin-bottom:-100%;
 }
@@ -57,11 +63,32 @@ input#backbtn {
 
 textarea, input {
   font-size:120%;
-  background-color:#F0F0F0; 
+  background-color:#F0F0F0;
 }
+
+textarea {
+  margin-bottom:5px;
+}
+
+#wrapper {
+    width:2500px;
+    overflow: hidden;
+}
+
+#first {
+    width:auto;
+    float:left;
+    padding-right:15px;
+}
+
+#second {
+    float:left;
+}
+
 /* blue button */
 
 input.btn.btn-blue {
+  margin-bottom:10px;
 	background-color: #699DB6;
 	border-color: rgba(0,0,0,0.3);
 	text-shadow: 0 1px 0 rgba(0,0,0,0.5);
@@ -76,9 +103,6 @@ input.btn.btn-blue:hover {
 input.btn.btn-blue:active {
   background-color: #3C677B;
   border-color: rgba(0,0,0,0.9);
-}
-
-input {
 }
 
 object {
