@@ -46,22 +46,22 @@ indexHandler = do
       case author of
         Just au -> makePDF au no ("note" ++ show noteNumber) noteRef
         Nothing -> makePDF "" no ("note" ++ show noteNumber) noteRef
-    Nothing -> render "index"
+    Nothing -> renderWithSplices "index" (errorSplice "" "")
   where
     makePDF au no note noteRef = do
       liftIO $ renderFile (note++".tex") $ createPDF (decodeUtf8 au) 
                                            ((split (=='\n') . decodeUtf8) no)
       (eCode, _, _) <- liftIO $ runPdflatex (note ++ ".tex")
       case eCode of
-        (ExitFailure x) -> renderWithSplices "indexerr" (errorSplice 
+        (ExitFailure x) -> renderWithSplices "index" (errorSplice 
           ("Error when compiling to LaTeX. Are you sure you typed your \
-          \LaTeX code correctly?"))
+          \LaTeX code correctly?") (decodeUtf8 no))
         (ExitSuccess)   -> do
           (eCode2, _, _) <- liftIO $ runCopy (note ++ ".pdf")
           case eCode2 of
-            (ExitFailure x) -> renderWithSplices "indexerr" (errorSplice 
+            (ExitFailure x) -> renderWithSplices "index" (errorSplice 
               ("Error when compiling to LaTeX. Are you sure you typed your \
-              \LaTeX code correctly?"))
+              \LaTeX code correctly?") (decodeUtf8 no))
             (ExitSuccess)   -> do
               liftIO $ modifyIORef' noteRef (+1)
               notenr .= noteRef
@@ -79,10 +79,11 @@ notesInit = makeSnaplet "notes" "Note maker" Nothing $ do
   newRef <- liftIO $ newIORef 0
   return $ Notes { _heist = h, _notenr = newRef }
 
--- | Splice used to pass an error message to the indexerr template
-errorSplice :: (Monad m) => String -> Splices (HeistT n m Template)
-errorSplice errMsg = do
+-- | Splice used to pass an error message and notes to the index template
+errorSplice :: (Monad m) => String -> Text -> Splices (HeistT n m Template)
+errorSplice errMsg notes = do
   "error" ## textSplice (DT.pack errMsg)
+  "oldnotes" ## textSplice notes
 
 -- | Splice used to pass the correct filename to the PDF template
 noteSplice :: (Monad m) => String -> Splices (HeistT n m Template)

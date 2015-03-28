@@ -14,14 +14,14 @@
           <li><i>##br</i> - Line break</li>
           <li><i>##np</i> - Page break</li>
         </ul>
-        <apply-content/>
+        <h5><error/></h5>
       </nav>
       <section>
         <form name="foo" method="post">
           <h5>Author (optional):<br>
           <input type="text" name="author" size="100" autocomplete="on" autofocus> </h5>
           <h5>Notes:<br>
-          <textarea name="note" cols="100" rows="20" autocomplete="off" placeholder="Enter your notes here!" required></textarea><br>
+          <textarea name="note" cols="100" rows="20" autocomplete="off" placeholder="Enter your notes here!" required><oldnotes/></textarea><br>
           <input type="submit" value="Create PDF" class="btn btn-blue" /></h5>
         </form>
       </section>
