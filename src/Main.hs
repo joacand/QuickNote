@@ -43,25 +43,29 @@ indexHandler = do
     Just no -> do
       noteRef <- use notenr
       noteNumber <- liftIO $ readIORef noteRef
-      liftIO $ modifyIORef' noteRef (+1)
-      notenr .= noteRef
       case author of
-        Just au -> makePDF au no ("note" ++ show noteNumber)
-        Nothing -> makePDF "" no ("note" ++ show noteNumber)
+        Just au -> makePDF au no ("note" ++ show noteNumber) noteRef
+        Nothing -> makePDF "" no ("note" ++ show noteNumber) noteRef
     Nothing -> render "index"
   where
-    makePDF au no note = do
+    makePDF au no note noteRef = do
       liftIO $ renderFile (note++".tex") $ createPDF (decodeUtf8 au) 
                                            ((split (=='\n') . decodeUtf8) no)
       (eCode, _, _) <- liftIO $ runPdflatex (note ++ ".tex")
       case eCode of
-        (ExitFailure x) -> render "indexerr"
+        (ExitFailure x) -> renderWithSplices "indexerr" (errorSplice 
+          ("Error when compiling to LaTeX. Are you sure you typed your \
+          \LaTeX code correctly?"))
         (ExitSuccess)   -> do
           (eCode2, _, _) <- liftIO $ runCopy (note ++ ".pdf")
           case eCode2 of
-            (ExitFailure x) -> render "indexerr"
-            (ExitSuccess)   -> renderWithSplices "pdfpage" 
-                               (noteSplice (note++".pdf"))
+            (ExitFailure x) -> renderWithSplices "indexerr" (errorSplice 
+              ("Error when compiling to LaTeX. Are you sure you typed your \
+              \LaTeX code correctly?"))
+            (ExitSuccess)   -> do
+              liftIO $ modifyIORef' noteRef (+1)
+              notenr .= noteRef
+              renderWithSplices "pdfpage" (noteSplice (note++".pdf"))
     runPdflatex note = readProcessWithExitCode "pdflatex" [note] ""
     runCopy     note = readProcessWithExitCode "cp" [note, "static/"] ""
 
@@ -75,10 +79,15 @@ notesInit = makeSnaplet "notes" "Note maker" Nothing $ do
   newRef <- liftIO $ newIORef 0
   return $ Notes { _heist = h, _notenr = newRef }
 
+-- | Splice used to pass an error message to the indexerr template
+errorSplice :: (Monad m) => String -> Splices (HeistT n m Template)
+errorSplice errMsg = do
+  "error" ## textSplice (DT.pack errMsg)
+
 -- | Splice used to pass the correct filename to the PDF template
 noteSplice :: (Monad m) => String -> Splices (HeistT n m Template)
 noteSplice n = do
-  "note" ## textSplice (DT.pack $ n)
+  "note" ## textSplice (DT.pack n)
 
 -- | Creates the LaTeX PDF
 createPDF :: Text -> [Text] -> LaTeX

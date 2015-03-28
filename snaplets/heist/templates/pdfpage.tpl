@@ -1,5 +1,5 @@
 <apply template="base">
-<p><a href="static/${note}">Click here </a>to download the PDF</p>
+<p><a href="static/${note}">Click here</a> to download the PDF</p>
 
 <form>
   <input id="backbtn" type="button" class="btn btn-blue" value="Back" onClick="history.go(-1);return true;"/>
