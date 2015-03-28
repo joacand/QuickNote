@@ -49,24 +49,24 @@ indexHandler = do
     Nothing -> renderWithSplices "index" (errorSplice "" "")
   where
     makePDF au no note noteRef = do
-      liftIO $ renderFile (note++".tex") $ createPDF (decodeUtf8 au) 
+      liftIO $ renderFile ("tmp/"++note++".tex") $ createPDF (decodeUtf8 au) 
                                            ((split (=='\n') . decodeUtf8) no)
-      (eCode, _, _) <- liftIO $ runPdflatex (note ++ ".tex")
+      (eCode, _, _) <- liftIO $ runPdflatex ("tmp/"++note ++ ".tex")
       case eCode of
-        (ExitFailure x) -> renderWithSplices "index" (errorSplice 
-          ("Error when compiling to LaTeX. Are you sure you typed your \
-          \LaTeX code correctly?") (decodeUtf8 no))
+        (ExitFailure x) -> renderError no
         (ExitSuccess)   -> do
-          (eCode2, _, _) <- liftIO $ runCopy (note ++ ".pdf")
+          (eCode2, _, _) <- liftIO $ runCopy ("tmp/"++note ++ ".pdf")
           case eCode2 of
-            (ExitFailure x) -> renderWithSplices "index" (errorSplice 
-              ("Error when compiling to LaTeX. Are you sure you typed your \
-              \LaTeX code correctly?") (decodeUtf8 no))
+            (ExitFailure x) -> renderError no
             (ExitSuccess)   -> do
               liftIO $ modifyIORef' noteRef (+1)
               notenr .= noteRef
               renderWithSplices "pdfpage" (noteSplice (note++".pdf"))
-    runPdflatex note = readProcessWithExitCode "pdflatex" [note] ""
+    renderError no = renderWithSplices "index" (errorSplice 
+                     ("Error when compiling to LaTeX. Are you sure you typed \
+                      \your LaTeX code correctly?") (decodeUtf8 no))
+    runPdflatex note = readProcessWithExitCode "pdflatex" 
+                       ["-output-directory=tmp", note] ""
     runCopy     note = readProcessWithExitCode "cp" [note, "static/"] ""
 
 -- | Initializer for notes snaplet
