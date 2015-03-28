@@ -36,7 +36,7 @@
     </div>
     <footer>
       <!-- Eventuell copyright osv -->
-      <p><a href="https://github.com/joacand/QuickNote">QuickNote v0.1</a> - Written in Haskell</p>
+      <p><a href="https://github.com/joacand/QuickNote">QuickNote v0.2</a> - Written in Haskell</p>
     </footer>
 </apply>
 
