@@ -27,34 +27,30 @@ h5 {
 }
 
 nav {
-    font-size:80%;
-    line-height:17px;
-    background-color:#eeeeee; 
+  font-size:80%;
+  line-height:17px;
+  background-color:#eeeeee; 
 /*    background-color:#000044;  */
 /*    color:#FFFFFF;
 */    width:200px;
-    float:left;
-    padding:5px; 
-    padding-bottom:100%;
-    margin-bottom:-100%;
+  height:100%;
+  float:left;
+  padding:5px; 
+  padding-bottom:100%;
+  margin-bottom:-100%;
 }
 
 section {
-    width:350px;
-    float:left;
-    padding-left:10px;
-    padding-right:10px;
-    padding-top:10px; 
-    padding-bottom:100%;
-    margin-bottom:-100%;
+  height:100%;
+  overflow:hidden;
 }
 
 footer {
-    background-color:#000033;
-    color:lightblue;
-    clear:both;
-    text-align:center;
-    padding:1px; 
+  background-color:#000033;
+  color:lightblue;
+  clear:both;
+  text-align:center;
+  padding:1px; 
 }
 
 input#backbtn {
@@ -62,53 +58,61 @@ input#backbtn {
 }
 
 textarea, input {
+  width:100%;
   font-size:120%;
   background-color:#F0F0F0;
 }
 
 textarea {
   margin-bottom:5px;
+  width:99%;
 }
 
 #wrapper {
-    width:2500px;
-    overflow: hidden;
+/*  border:2px solid red; */
+  overflow: hidden;
 }
 
 #first {
-    width:auto;
-    float:left;
-    padding-right:15px;
+  width:45%;
+  float:left;
 }
 
 #second {
-    float:left;
+  overflow:hidden;
+}
+
+span {
+  display: block;
+  overflow: hidden;
+  padding: 0 1em;
+}
+
+object {
+height:100vh;
+}
+
+body {
+background-color:#D8D8D8;
 }
 
 /* blue button */
 
 input.btn.btn-blue {
-  margin-bottom:10px;
-	background-color: #699DB6;
-	border-color: rgba(0,0,0,0.3);
-	text-shadow: 0 1px 0 rgba(0,0,0,0.5);
-	color: #FFF;
+margin-bottom:10px;
+background-color: #699DB6;
+border-color: rgba(0,0,0,0.3);
+text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+color: #FFF;
 }
 
 input.btn.btn-blue:hover {
-  background-color: #4F87A2;
-  border-color: rgba(0,0,0,0.5);
+background-color: #4F87A2;
+border-color: rgba(0,0,0,0.5);
 }
 
 input.btn.btn-blue:active {
-  background-color: #3C677B;
-  border-color: rgba(0,0,0,0.9);
+background-color: #3C677B;
+border-color: rgba(0,0,0,0.9);
 }
 
-object {
-  height:100vh;
-}
-
-body {
-  background-color:#D8D8D8;
-}

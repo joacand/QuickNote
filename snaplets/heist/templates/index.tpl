@@ -18,18 +18,15 @@
       </nav>
       <section>
         <form name="foo" method="post">
-          <div id="wrapper">
-            <div id="first">
-              <h5>Title:<br>
-              <input type="text" name="title" size="72" autocomplete="on" autofocus> </h5>
-            </div>
-            <div id="second">
-              <h5>Author:<br>
-              <input type="text" name="author" size="73" autocomplete="on"> </h5>
-            </div>
+          <div id="first">
+            <h5>Title:<br>
+            <input type="text" size="100%" name="title" autocomplete="on" autofocus> </h5>
           </div>
-          <h5>
-          <textarea name="note" cols="150" rows="20" autocomplete="off" placeholder="Enter your notes here!" required><oldnotes/></textarea><br>
+          <div id="second">
+            <h5><span>Author:<br>
+            <input type="text" name="author" autocomplete="on"></span> </h5>
+          </div>
+          <h5><textarea name="note" cols="100%" rows="20" autocomplete="off" placeholder="Enter your notes here!" required><oldnotes/></textarea><br>
           <input type="submit" value="Create PDF" class="btn btn-blue" /></h5>
         </form>
       </section>
