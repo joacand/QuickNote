@@ -37,7 +37,12 @@ main = do
 -- | Gets called when user fetches index of homepage, 
 -- gets the notes and author and creates the PDF document
 indexHandler :: Handler Notes Notes ()
-indexHandler = do
+indexHandler = ifTop ( indexHandler' )
+               <|> error404
+
+-- | Helper function to 'indexHandler'
+indexHandler' :: Handler Notes Notes ()
+indexHandler' = do
   title  <- getParam "title"
   author <- getParam "author"
   notes  <- getParam "note"
@@ -70,11 +75,15 @@ indexHandler = do
                        ["-output-directory=tmp", note] ""
     runCopy     note = readProcessWithExitCode "cp" [note, "static/"] ""
 
+-- | Render 404 page
+error404 :: Handler Notes Notes ()
+error404 = render "404"
+
 -- | Initializer for notes snaplet
 notesInit :: SnapletInit Notes Notes
 notesInit = makeSnaplet "notes" "Note maker" Nothing $ do 
   h <- nestSnaplet "heist" heist $ heistInit "templates"
-  addRoutes [("static", serveDirectory "static")
+  addRoutes [ ("static", serveDirectory "static")
             , ("css", serveDirectory "css")
             , ("", indexHandler) ]
   newRef <- liftIO $ newIORef 0
